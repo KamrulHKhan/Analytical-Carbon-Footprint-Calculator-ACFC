@@ -19,6 +19,9 @@ from src.calculations import (
 
 st.set_page_config(page_title='Analytical Carbon Footprint Calculator (ACFC)',page_icon='🌍',layout='wide')
 
+if "result" not in st.session_state:
+    st.session_state.result = None
+
 col_logo, col_text = st.columns([3, 7])
 
 with col_logo:
