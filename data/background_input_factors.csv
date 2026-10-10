@@ -1,0 +1,16 @@
+Category,Name,Quantity,GWP20 Emission Factor,GWP100 Emission Factor,Density,Unit Mass,Lifetime Uses,Split Resource Factor,Energy Use
+Reusable,Lab Safety Shoes,1,60,60,1,,260,1,0
+Reusable,Pen,1,0.038,0.038,1,,20,1,0
+Reusable,Lab Notebook,1,0.3732,0.3732,1,,20,1,0
+Reusable,Lab Coat,1,0.181,0.181,1,,20,1,0
+Reusable,Safety Glasses,1,0.2,0.2,1,,20,1,0
+Reusable,Sharpie,1,0.038,0.038,1,,20,1,0
+Reusable,Pipette Bulb,1,0.1563,0.1225,1,,20,1,0
+Lab Equipment,PC w/ Monitor,1,1040,1040,1,,1040,2,3.12
+Lab Equipment,Glassware Washer,1,2160,1853.9235,1,,10000,12,4.5
+Lab Equipment,Analytical Balance,1,56.16,56.16,1,,2080,3,0.0912
+Lab Equipment,GC Column Cost (in $),1,1,1,1,,1000,50,0
+Lab Equipment,LC Column Cost (in $),1,1,1,1,,1000,50,0
+Lab Equipment,Benchtop Enclosure,1,476.476,384.9818,1,,4160,3,0
+Lab Equipment,Fume Hood,1,2671.569,2211.453,1,,4160,1,0
+Lab Equipment,Lab Bench,1,965.53,818.54,1,,4160,1,0
