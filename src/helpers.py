@@ -86,6 +86,10 @@ def editor(items, key, qcol='Quantity', default=0, label='Item'):
     return edited
 
 def standardize_quantity(df):
+    if "Quantity (mL or mg)" in df.columns:
+        df["Quantity (mL or mg)"] = df["Quantity (mL or mg)"] / 1000
+        df.rename(columns={"Quantity (mL or mg)": "Quantity"}, inplace=True)
+
     if "Quantity (mL)" in df.columns:
         df["Quantity (mL)"] = df["Quantity (mL)"] / 1000
         df.rename(columns={"Quantity (mL)": "Quantity"}, inplace=True)

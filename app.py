@@ -23,6 +23,10 @@ from src.calculations import (
 
 st.set_page_config(page_title='Analytical Carbon Footprint Calculator (ACFC)',page_icon='🌍',layout='wide')
 
+def reset_calculator():
+    st.session_state.clear()
+    st.rerun()
+
 st.markdown(
     """
     <style>
@@ -59,9 +63,11 @@ st.markdown(
 )
 
 with st.container(key="reset_control"):
-    if st.button("🔄 Reset Calculator", key="reset_calculator"):
-        st.session_state.clear()
-        st.rerun()
+    st.button(
+        "🔄 Reset Calculator",
+        type="primary",
+        on_click=reset_calculator
+    )
 
 if "result" not in st.session_state:
     st.session_state.result = None
