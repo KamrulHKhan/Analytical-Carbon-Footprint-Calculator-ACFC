@@ -1,6 +1,10 @@
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+# import base64
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
+
 from src.factors import (
     GRID_DEFAULT, MOBILE_PHASES, OTHER_CHEMICALS, CONSUMABLES, ANALYTICAL_INSTRUMENTS, GAS_GENERATORS, GENERAL_LAB_EQUIPMENT,
     SOLVENT_PACKAGING_ITEM_NAMES_EXCLUDED, SOLVENT_WASTE_ITEM_NAMES_EXCLUDED, GAS_TRANSPORTATION_ITEM_NAMES, 
@@ -18,6 +22,46 @@ from src.calculations import (
 )
 
 st.set_page_config(page_title='Analytical Carbon Footprint Calculator (ACFC)',page_icon='🌍',layout='wide')
+
+st.markdown(
+    """
+    <style>
+    .st-key-reset_control {
+        position: fixed;
+        top: 65px;
+        right: 20px;
+        width: auto;
+        z-index: 999;
+    }
+
+    .st-key-reset_control button {
+        background-color: #0067B8;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 8px 16px;
+    }
+
+    /* ADD THIS */
+    .st-key-reset_control button p {
+        font-size: 20px !important;
+        font-weight: 600 !important;
+    }
+
+    .st-key-reset_control button:hover {
+        background-color: #005A9E;
+        color: white;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+with st.container(key="reset_control"):
+    if st.button("🔄 Reset Calculator", key="reset_calculator"):
+        st.session_state.clear()
+        st.rerun()
 
 if "result" not in st.session_state:
     st.session_state.result = None
@@ -45,6 +89,12 @@ with col_text:
         """,
         unsafe_allow_html=True,
     )
+
+st.markdown(
+    """
+    **Developed by:** Md Kamrul Hasan Khan (MdKamrulHasan.Khan@pfizer.com), Md Sajjadur Rahman (MdSajjadur.Rahman@pfizer.com), William Hiers (William.Heirs@pfizer.com)
+    """
+)
 
 user_input_factors = pd.read_csv('data/user_input_factors.csv')
 
@@ -79,7 +129,7 @@ selected = st.multiselect(
 other = editor(
     [{'name': x} for x in selected],
     'other',
-    'Quantity (mL)',
+    'Quantity (mL or mg)',
     0.0,
     'Chemical'
 )
@@ -264,6 +314,21 @@ if st.session_state.result is not None:
         result["method"]
     )
 
+    metrics_df = pd.DataFrame({
+        "Technique": [result["technique"]],
+        "Method": [result["method"]],
+        "Total GWP20 (kg CO2e)": [total_gwp20],
+        "Total GWP100 (kg CO2e)": [total_gwp100]
+    })
+    # st.dataframe(metrics_df, hide_index=True)
+
+    st.download_button(
+        "Download ACFC Summary Results (CSV)",
+        metrics_df.to_csv(index=False).encode("utf-8-sig"),
+        "ACFC_summary_results.csv",
+        "text/csv",
+        use_container_width=True
+    )
     # =================================================
     # Charts and Detailed Results
     # =================================================
@@ -292,52 +357,193 @@ if st.session_state.result is not None:
             .sum()
         )
 
-        chart1, chart2, chart3 = st.columns(3)
+        # chart1, chart2, chart3 = st.columns(3)
 
-        with chart1:
+        # with chart1:
 
-            st.plotly_chart(
-                px.bar(
-                    emissions_by_category,
-                    x="Category",
-                    y=[
-                        "GWP20 (kg CO2e)",
-                        "GWP100 (kg CO2e)"
-                    ],
-                    barmode="group",
-                    title="Emissions by Category",
-                    labels={
-                        "value": "Emissions (kg CO₂e)"
-                    }
-                ),
-                use_container_width=True
-            )
+        #     fig_bar = px.bar(
+        #             emissions_by_category,
+        #             x="Category",
+        #             y=[
+        #                 "GWP20 (kg CO2e)",
+        #                 "GWP100 (kg CO2e)"
+        #             ],
+        #             barmode="group",
+        #             title="Emissions by Category",
+        #             labels={
+        #                 "value": "Emissions (kg CO₂e)"
+        #             }
+        #         )
+        #     st.plotly_chart(
+        #         # px.bar(
+        #         #     emissions_by_category,
+        #         #     x="Category",
+        #         #     y=[
+        #         #         "GWP20 (kg CO2e)",
+        #         #         "GWP100 (kg CO2e)"
+        #         #     ],
+        #         #     barmode="group",
+        #         #     title="Emissions by Category",
+        #         #     labels={
+        #         #         "value": "Emissions (kg CO₂e)"
+        #         #     }
+        #         # ),
+        #         fig_bar,
+        #         use_container_width=True
+        #     )
 
-        with chart2:
+        # with chart2:
+        #     fig_pie20 = px.pie(
+        #             emissions_by_category,
+        #             names="Category",
+        #             values="GWP20 (kg CO2e)",
+        #             hole=0.45,
+        #             title="GWP20 Contribution"
+        #         )
 
-            st.plotly_chart(
-                px.pie(
-                    emissions_by_category,
-                    names="Category",
-                    values="GWP20 (kg CO2e)",
-                    hole=0.45,
-                    title="GWP20 Contribution"
-                ),
-                use_container_width=True
-            )
+        #     st.plotly_chart(
+        #         # px.pie(
+        #         #     emissions_by_category,
+        #         #     names="Category",
+        #         #     values="GWP20 (kg CO2e)",
+        #         #     hole=0.45,
+        #         #     title="GWP20 Contribution"
+        #         # ),
+        #         fig_pie20,
+        #         use_container_width=True
+        #     )
 
-        with chart3:
+        # with chart3:
 
-            st.plotly_chart(
-                px.pie(
-                    emissions_by_category,
-                    names="Category",
-                    values="GWP100 (kg CO2e)",
-                    hole=0.45,
-                    title="GWP100 Contribution"
-                ),
-                use_container_width=True
-            )
+        #     fig_pie100 = px.pie(
+        #         emissions_by_category,
+        #         names="Category",
+        #         values="GWP100 (kg CO2e)",
+        #         hole=0.45,
+        #         title="GWP100 Contribution"
+        #     )
+
+        #     st.plotly_chart(
+        #         # px.pie(
+        #         #     emissions_by_category,
+        #         #     names="Category",
+        #         #     values="GWP100 (kg CO2e)",
+        #         #     hole=0.45,
+        #         #     title="GWP100 Contribution"
+        #         # ),
+        #         fig_pie100,
+        #         use_container_width=True
+        #     )
+
+        fig = make_subplots(
+            rows=1,
+            cols=3,
+            specs=[
+                [{"type": "xy"}, {"type": "domain"}, {"type": "domain"}]
+            ],
+            subplot_titles=[
+                "Emissions by Category",
+                "GWP20 Contribution",
+                "GWP100 Contribution"
+            ]
+        )
+
+        # -------------------------
+        # Bar chart
+        # -------------------------
+        fig.add_trace(
+            go.Bar(
+                x=emissions_by_category["Category"],
+                y=emissions_by_category["GWP20 (kg CO2e)"],
+                name="GWP20 (kg CO2e)",
+                legend="legend"
+            ),
+            row=1,
+            col=1
+        )
+
+        fig.add_trace(
+            go.Bar(
+                x=emissions_by_category["Category"],
+                y=emissions_by_category["GWP100 (kg CO2e)"],
+                name="GWP100 (kg CO2e)",
+                legend="legend"
+            ),
+            row=1,
+            col=1
+        )
+
+        # -------------------------
+        # GWP20 donut
+        # -------------------------
+        fig.add_trace(
+            go.Pie(
+                labels=emissions_by_category["Category"],
+                values=emissions_by_category["GWP20 (kg CO2e)"],
+                hole=0.45,
+                name="GWP20",
+                legend="legend2"
+            ),
+            row=1,
+            col=2
+        )
+
+        # -------------------------
+        # GWP100 donut
+        # -------------------------
+        fig.add_trace(
+            go.Pie(
+                labels=emissions_by_category["Category"],
+                values=emissions_by_category["GWP100 (kg CO2e)"],
+                hole=0.45,
+                name="GWP100",
+                legend="legend2",
+                showlegend=False   # don't repeat category legend
+            ),
+            row=1,
+            col=3
+        )
+
+        # -------------------------
+        # Layout
+        # -------------------------
+        fig.update_layout(
+            barmode="group",
+            height=450,
+
+            # Bar plot legend
+            legend=dict(
+                x=0.20,
+                y=1.0,
+                xanchor="left",
+                yanchor="top"
+            ),
+
+            # ONE shared category legend for both pie charts
+            legend2=dict(
+                x=1.02,
+                y=1.0,
+                xanchor="left",
+                yanchor="top"
+            ),
+
+            # Space for pie-chart legend
+            margin=dict(r=150)
+        )
+
+        fig.update_yaxes(
+            title_text="Emissions (kg CO₂e)",
+            row=1,
+            col=1
+        )
+
+        # -------------------------
+        # ONE Streamlit call
+        # -------------------------
+        st.plotly_chart(
+            fig,
+            use_container_width=True
+        )
 
         st.subheader("Download Detailed Results")
 
@@ -368,10 +574,18 @@ if st.session_state.result is not None:
         detail["Name"].isin(user_input_factors["Name"][:69]),
         "Quantity"
     ].empty:
+
+        total_row = pd.DataFrame([{
+            "Method Name": "Total",
+            "GWP20 (kg CO2e)": export_df["GWP20 (kg CO2e)"].sum().round(1),
+            "GWP100 (kg CO2e)": export_df["GWP100 (kg CO2e)"].sum().round(1)
+        }])
+
+        export_df = pd.concat([export_df, total_row], ignore_index=True)
         st.download_button(
-            "Download detailed results (CSV)",
+            "Download ACFC Detailed Results (CSV)",
             export_df.to_csv(index=False).encode("utf-8-sig"),
-            "laboratory_co2_results.csv",
+            "ACFC_detailed_results.csv",
             "text/csv",
             use_container_width=True
         )
